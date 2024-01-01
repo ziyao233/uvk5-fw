@@ -1,4 +1,6 @@
-/* Copyright 2023 Dual Tachyon
+/*
+ * Copyright (c) 2024 Yao Zi
+ * Copyright 2023 Dual Tachyon
  * https://github.com/DualTachyon
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,6 +20,7 @@
 #if defined(ENABLE_FMRADIO)
 #include "app/fm.h"
 #endif
+#include "app/satelite.h"
 #include "bitmaps.h"
 #include "driver/keyboard.h"
 #include "driver/st7565.h"
@@ -82,6 +85,9 @@ void UI_DisplayStatus(void)
 		memcpy(gStatusLine + 7, BITMAP_NOAA, sizeof(BITMAP_NOAA));
 	}
 #endif
+	if (gSateliteMode)
+		memcpy(gStatusLine + 7, BITMAP_SATELITE, sizeof(BITMAP_SATELITE));
+
 	ST7565_BlitStatusLine();
 }
 

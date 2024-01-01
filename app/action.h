@@ -1,4 +1,6 @@
-/* Copyright 2023 Dual Tachyon
+/*
+ * Copyright (c) 2024 Yao Zi
+ * Copyright 2023 Dual Tachyon
  * https://github.com/DualTachyon
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -23,6 +25,7 @@ void ACTION_Power(void);
 void ACTION_Scan(bool bFlag);
 void ACTION_Vox(void);
 void ACTION_FM(void);
+void ACTION_Satelite(void);
 
 void ACTION_Handle(KEY_Code_t Key, bool bKeyPressed, bool bKeyHeld);
 

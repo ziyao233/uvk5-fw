@@ -1,4 +1,6 @@
-/* Copyright 2023 Dual Tachyon
+/*
+ * Copyright (c) 2024 Yao Zi
+ * Copyright 2023 Dual Tachyon
  * https://github.com/DualTachyon
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -218,6 +220,7 @@ static void MAIN_Key_DIGITS(KEY_Code_t Key, bool bKeyPressed, bool bKeyHeld)
 		break;
 
 	case KEY_5:
+		ACTION_Satelite();
 #if defined(ENABLE_NOAA)
 		if (IS_NOT_NOAA_CHANNEL(gTxVfo->CHANNEL_SAVE)) {
 			gEeprom.ScreenChannel[Vfo] = gEeprom.NoaaChannel[gEeprom.TX_VFO];
@@ -228,6 +231,7 @@ static void MAIN_Key_DIGITS(KEY_Code_t Key, bool bKeyPressed, bool bKeyHeld)
 		gRequestSaveVFO = true;
 		gVfoConfigureMode = VFO_CONFIGURE_RELOAD;
 #endif
+
 		break;
 
 	case KEY_6:

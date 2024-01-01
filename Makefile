@@ -61,6 +61,7 @@ OBJS += app/dtmf.o
 ifeq ($(ENABLE_FMRADIO),1)
 OBJS += app/fm.o
 endif
+OBJS += app/satelite.o
 OBJS += app/generic.o
 OBJS += app/main.o
 OBJS += app/menu.o

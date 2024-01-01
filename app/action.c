@@ -1,4 +1,6 @@
-/* Copyright 2023 Dual Tachyon
+/*
+ * Copyright (c) 2024 Yao Zi
+ * Copyright 2023 Dual Tachyon
  * https://github.com/DualTachyon
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -20,6 +22,7 @@
 #if defined(ENABLE_FMRADIO)
 #include "app/fm.h"
 #endif
+#include "app/satelite.h"
 #include "app/scanner.h"
 #include "audio.h"
 #include "bsp/dp32g030/gpio.h"
@@ -192,6 +195,13 @@ void ACTION_FM(void)
 	}
 }
 #endif
+
+void
+ACTION_Satelite(void)
+{
+	SATELITE_mode_switch();
+	return;
+}
 
 void ACTION_Handle(KEY_Code_t Key, bool bKeyPressed, bool bKeyHeld)
 {

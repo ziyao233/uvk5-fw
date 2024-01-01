@@ -26,6 +26,7 @@ extern const uint8_t BITMAP_VoicePrompt[9];
 extern const uint8_t BITMAP_FM[12];
 #endif
 extern const uint8_t BITMAP_NOAA[12];
+extern const uint8_t BITMAP_SATELITE[11];
 
 extern const uint8_t BITMAP_Antenna[5];
 extern const uint8_t BITMAP_AntennaLevel1[3];
