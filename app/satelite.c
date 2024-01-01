@@ -9,11 +9,15 @@
 #include"misc.h"
 
 bool gSateliteMode;
+uint16_t gSateliteRemainTime, gSateliteStageRemainTime;
 
 void
 SATELITE_mode_switch(void)
 {
 	gSateliteMode = !gSateliteMode;
 	gUpdateStatus = true;
+	gSateliteRemainTime = 11 * 60 + 45;
+	gSateliteStageRemainTime = 191;
+	gUpdateDisplay = true;
 	return;
 }

@@ -1,4 +1,6 @@
-/* Copyright 2023 Dual Tachyon
+/*
+ * Copyright (c) 2024 Yao Zi.
+ * Copyright 2023 Dual Tachyon
  * https://github.com/DualTachyon
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,6 +18,7 @@
 
 #include <string.h>
 #include "app/dtmf.h"
+#include "app/satelite.h"
 #include "bitmaps.h"
 #include "driver/st7565.h"
 #include "external/printf/printf.h"
@@ -46,7 +49,7 @@ void UI_DisplayMain(void)
 		return;
 	}
 
-	for (i = 0; i < 2; i++) {
+	for (i = 0; i < 2 - gSateliteMode; i++) {
 		uint8_t *pLine0;
 		uint8_t *pLine1;
 		uint8_t Line;
@@ -373,6 +376,14 @@ void UI_DisplayMain(void)
 		if (gEeprom.VfoInfo[i].SCRAMBLING_TYPE && gSetting_ScrambleEnable) {
 			memcpy(pLine1 + 128 + 110, BITMAP_Scramble, sizeof(BITMAP_Scramble));
 		}
+	}
+
+	if (gSateliteMode) {
+		char s[11];
+		sprintf(s, "%03us %02u:%02u", gSateliteStageRemainTime,
+					      gSateliteRemainTime / 60,
+					      gSateliteRemainTime % 60);
+		UI_PrintString(s, 30, 111, 4, sizeof(s), true);
 	}
 
 	ST7565_BlitFullScreen();

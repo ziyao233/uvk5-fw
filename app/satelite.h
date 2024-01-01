@@ -9,8 +9,10 @@
 #define __APP_SATELITE_H_INC__
 
 #include<stdbool.h>
+#include<stdint.h>
 
 extern bool gSateliteMode;
+extern uint16_t gSateliteRemainTime, gSateliteStageRemainTime;
 
 void SATELITE_mode_switch(void);
 
