@@ -441,7 +441,7 @@ void MAIN_ProcessKeys(KEY_Code_t Key, bool bKeyPressed, bool bKeyHeld)
 		break;
 	case KEY_MENU:
 		if (gSateliteMode)
-			SATELITE_Start();
+			SATELITE_start();
 		else
 			MAIN_Key_MENU(bKeyPressed, bKeyHeld);
 		break;

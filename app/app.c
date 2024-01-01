@@ -31,6 +31,7 @@
 #if defined(ENABLE_UART)
 #include "app/uart.h"
 #endif
+#include"app/satelite.h"
 #include "ARMCM0.h"
 #include "audio.h"
 #include "board.h"
@@ -1076,6 +1077,21 @@ void APP_TimeSlice10ms(void)
 
 void APP_TimeSlice500ms(void)
 {
+	static bool oneSecond;
+
+	if (gSateliteDownCounting) {
+		oneSecond = !oneSecond;
+		if (!oneSecond) {
+			gSateliteRemainTime--;
+			gSateliteStageRemainTime--;
+			if (!gSateliteRemainTime)
+				gSateliteDownCounting = false;
+			else if (!gSateliteStageRemainTime)
+				SATELITE_next_stage();
+			gUpdateDisplay = true;
+		}
+	}
+
 	// Skipped authentic device check
 
 	if (gKeypadLocked) {

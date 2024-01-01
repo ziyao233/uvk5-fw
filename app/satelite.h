@@ -11,11 +11,15 @@
 #include<stdbool.h>
 #include<stdint.h>
 
-extern bool gSateliteMode;
+extern bool gSateliteMode, gSateliteDownCounting;
 extern uint16_t gSateliteRemainTime, gSateliteStageRemainTime;
 extern char gSateliteName[6];
 
 void SATELITE_mode_switch(void);
-void SATELITE_start(void);
+void SATELITE_next_stage(void);
+
+#define SATELITE_start() do { \
+	gSateliteDownCounting = true;		\
+} while (0)
 
 #endif	// __APP_SATELITE_H_INC__

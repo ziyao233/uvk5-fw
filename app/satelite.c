@@ -14,7 +14,7 @@
 #include"settings.h"
 #include"radio.h"
 
-bool gSateliteMode;
+bool gSateliteMode, gSateliteDownCounting;
 uint16_t gSateliteRemainTime, gSateliteStageRemainTime;
 char gSateliteName[6];
 uint16_t gSateliteNo;
@@ -54,7 +54,7 @@ satelite_set_freq(void)
 	gEeprom.TX_VFO = 0;
 	RADIO_SelectVfos();
 
-	do_set_freq(baseFreq - 2500 * gSateliteStage, 0);
+	do_set_freq(baseFreq - 250 * gSateliteStage, 0);
 	return;
 }
 
@@ -73,6 +73,7 @@ satelite_enter(void)
 static inline void
 satelite_exit(void)
 {
+	gSateliteDownCounting = false;
 	return;
 }
 
@@ -90,6 +91,10 @@ SATELITE_mode_switch(void)
 }
 
 void
-SATELITE_start(void)
+SATELITE_next_stage(void)
 {
+	gSateliteStage++;
+	satelite_set_stage_time();
+	satelite_set_freq();
+	return;
 }
