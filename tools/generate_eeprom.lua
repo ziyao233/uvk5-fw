@@ -52,7 +52,7 @@ local function convert(s)
 	assert(#s.name <= 5);
 	local t = ("<c5I1I4I4"):pack(s.name .. (" "):rep(5 - #s.name),
 				     (s.v2u and 1 or 0) << 4 | ctcss[s.CTCSS or ""],
-				     s.uFreq, s.vFreq);
+				     s.uFreq // 10, s.vFreq // 10);
 	for i = 1, 8
 	do
 		local length = s.slices[i] or 0;

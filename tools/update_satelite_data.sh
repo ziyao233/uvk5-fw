@@ -22,4 +22,4 @@ fi
 
 # There are still 100 MR channels available
 
-dd if=$2 of=$1 bs=1 seek=1600 fconv=notruc
+dd if=$2 of=$1 bs=1 seek=1600 conv=notrunc
