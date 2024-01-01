@@ -1085,7 +1085,7 @@ void APP_TimeSlice500ms(void)
 			gSateliteRemainTime--;
 			gSateliteStageRemainTime--;
 			if (!gSateliteRemainTime)
-				SATELITE_switch_mode();
+				SATELITE_mode_switch();
 			else if (!gSateliteStageRemainTime)
 				SATELITE_next_stage();
 			gUpdateDisplay = true;
