@@ -22,6 +22,7 @@
 #if defined(ENABLE_FMRADIO)
 #include "app/fm.h"
 #endif
+#include "app/satelite.h"
 #include "app/generic.h"
 #include "app/main.h"
 #include "app/scanner.h"
@@ -83,29 +84,10 @@ static void MAIN_Key_DIGITS(KEY_Code_t Key, bool bKeyPressed, bool bKeyHeld)
 			}
 			gInputBoxIndex = 0;
 			NUMBER_Get(gInputBox, &Frequency);
-			if (gSetting_350EN || (Frequency < 35000000 || Frequency > 39999990)) {
-				uint8_t i;
-
-				for (i = 0; i < 7; i++) {
-					if (Frequency <= gUpperLimitFrequencyBandTable[i] && (gLowerLimitFrequencyBandTable[i] <= Frequency)) {
-						gAnotherVoiceID = (VOICE_ID_t)Key;
-						if (gTxVfo->Band != i) {
-							gTxVfo->Band = i;
-							gEeprom.ScreenChannel[Vfo] = i + FREQ_CHANNEL_FIRST;
-							gEeprom.FreqChannel[Vfo] = i + FREQ_CHANNEL_FIRST;
-							SETTINGS_SaveVfoIndices();
-							RADIO_ConfigureChannel(Vfo, 2);
-						}
-						Frequency += 75;
-						gTxVfo->ConfigRX.Frequency = FREQUENCY_FloorToStep(
-								Frequency,
-								gTxVfo->StepFrequency,
-								gLowerLimitFrequencyBandTable[gTxVfo->Band]
-								);
-						gRequestSaveChannel = 1;
-						return;
-					}
-				}
+			if (gSetting_350EN || (Frequency < 35000000 ||
+			    Frequency > 39999990)) {
+				GENERIC_Set_Freq(Vfo, Frequency);
+				gAnotherVoiceID = (VOICE_ID_t)Key;
 			}
 		} else {
 #if defined(ENABLE_NOAA)
@@ -458,7 +440,10 @@ void MAIN_ProcessKeys(KEY_Code_t Key, bool bKeyPressed, bool bKeyHeld)
 		MAIN_Key_DIGITS(Key, bKeyPressed, bKeyHeld);
 		break;
 	case KEY_MENU:
-		MAIN_Key_MENU(bKeyPressed, bKeyHeld);
+		if (gSateliteMode)
+			SATELITE_Start();
+		else
+			MAIN_Key_MENU(bKeyPressed, bKeyHeld);
 		break;
 	case KEY_UP:
 		MAIN_Key_UP_DOWN(bKeyPressed, bKeyHeld, 1);

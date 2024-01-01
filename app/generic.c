@@ -30,6 +30,36 @@
 #include "settings.h"
 #include "ui/inputbox.h"
 #include "ui/ui.h"
+#include "frequencies.h"
+
+void
+GENERIC_Set_Freq(int Vfo, uint32_t Frequency)
+{
+	uint8_t i;
+
+	for (i = 0; i < 7; i++) {
+		if (Frequency <= gUpperLimitFrequencyBandTable[i] &&
+		    (gLowerLimitFrequencyBandTable[i] <= Frequency)) {
+			if (gTxVfo->Band != i) {
+				gTxVfo->Band = i;
+				gEeprom.ScreenChannel[Vfo] = i + FREQ_CHANNEL_FIRST;
+				gEeprom.FreqChannel[Vfo] = i + FREQ_CHANNEL_FIRST;
+				SETTINGS_SaveVfoIndices();
+				RADIO_ConfigureChannel(Vfo, 2);
+			}
+
+			Frequency += 75;
+			gTxVfo->ConfigRX.Frequency = FREQUENCY_FloorToStep(
+					Frequency,
+					gTxVfo->StepFrequency,
+					gLowerLimitFrequencyBandTable[gTxVfo->Band]
+				);
+			gRequestSaveChannel = 1;
+			return;
+		}
+	}
+	return;
+}
 
 void GENERIC_Key_F(bool bKeyPressed, bool bKeyHeld)
 {

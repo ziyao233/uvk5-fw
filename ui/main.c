@@ -1,6 +1,4 @@
-/*
- * Copyright (c) 2024 Yao Zi.
- * Copyright 2023 Dual Tachyon
+/* Copyright 2023 Dual Tachyon
  * https://github.com/DualTachyon
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -380,9 +378,9 @@ void UI_DisplayMain(void)
 
 	if (gSateliteMode) {
 		char s[11];
-		sprintf(s, "%03us %02u:%02u", gSateliteStageRemainTime,
-					      gSateliteRemainTime / 60,
-					      gSateliteRemainTime % 60);
+		sprintf(s, "%s %02u:%02u", gSateliteName,
+					   gSateliteRemainTime / 60,
+					   gSateliteRemainTime % 60);
 		UI_PrintString(s, 30, 111, 4, sizeof(s), true);
 	}
 

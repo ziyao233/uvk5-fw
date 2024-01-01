@@ -13,7 +13,9 @@
 
 extern bool gSateliteMode;
 extern uint16_t gSateliteRemainTime, gSateliteStageRemainTime;
+extern char gSateliteName[6];
 
 void SATELITE_mode_switch(void);
+void SATELITE_start(void);
 
 #endif	// __APP_SATELITE_H_INC__

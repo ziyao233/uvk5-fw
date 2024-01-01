@@ -17,8 +17,10 @@
 #ifndef APP_GENERIC_H
 #define APP_GENERIC_H
 
+#include <stdint.h>
 #include <stdbool.h>
 
+void GENERIC_Set_Freq(int Vfo, uint32_t Frequency);
 void GENERIC_Key_F(bool bKeyPressed, bool bKeyHeld);
 void GENERIC_Key_PTT(bool bKeyPressed);
 
