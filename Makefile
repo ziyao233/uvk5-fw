@@ -1,9 +1,9 @@
 TARGET = firmware
 
-ENABLE_AIRCOPY := 0
-ENABLE_ALARM := 0
+ENABLE_AIRCOPY := 1
+ENABLE_ALARM := 1
 ENABLE_FMRADIO := 1
-ENABLE_NOAA := 0
+ENABLE_NOAA := 1
 ENABLE_OVERLAY := 1
 ENABLE_SWD := 0
 ENABLE_TX1750 := 1
@@ -13,8 +13,6 @@ BSP_DEFINITIONS := $(wildcard hardware/*/*.def)
 BSP_HEADERS := $(patsubst hardware/%,bsp/%,$(BSP_DEFINITIONS))
 BSP_HEADERS := $(patsubst %.def,%.h,$(BSP_HEADERS))
 
-LIBGCC ?= /usr/lib/gcc/arm-none-eabi/13.1.0/libgcc.a
-
 OBJS =
 # Startup files
 OBJS += start.o
@@ -23,9 +21,6 @@ ifeq ($(ENABLE_OVERLAY),1)
 OBJS += sram-overlay.o
 endif
 OBJS += external/printf/printf.o
-
-# Libs
-OBJS += lib.o
 
 # Drivers
 OBJS += driver/adc.o
@@ -114,7 +109,7 @@ endif
 
 AS = arm-none-eabi-gcc
 CC = arm-none-eabi-gcc
-LD = arm-none-eabi-ld
+LD = arm-none-eabi-gcc
 OBJCOPY = arm-none-eabi-objcopy
 SIZE = arm-none-eabi-size
 
@@ -124,7 +119,7 @@ ASFLAGS = -c -mcpu=cortex-m0
 ifeq ($(ENABLE_OVERLAY),1)
 ASFLAGS += -DENABLE_OVERLAY
 endif
-CFLAGS = -Os -Wall -Werror -mcpu=cortex-m0 -fno-builtin -fshort-enums -fno-delete-null-pointer-checks -std=c11 -MMD -ffreestanding
+CFLAGS = -Os -Wall -Werror -mcpu=cortex-m0 -fno-builtin -fshort-enums -fno-delete-null-pointer-checks -std=c11 -MMD
 CFLAGS += -DPRINTF_INCLUDE_CONFIG_H
 CFLAGS += -DGIT_HASH=\"$(GIT_HASH)\"
 ifeq ($(ENABLE_AIRCOPY),1)
@@ -151,7 +146,7 @@ endif
 ifeq ($(ENABLE_UART),1)
 CFLAGS += -DENABLE_UART
 endif
-LDFLAGS = -T firmware.ld
+LDFLAGS = -mcpu=cortex-m0 -nostartfiles -Wl,-T,firmware.ld
 
 ifeq ($(DEBUG),1)
 ASFLAGS += -g
@@ -163,14 +158,15 @@ INC =
 INC += -I $(TOP)
 INC += -I $(TOP)/external/CMSIS_5/CMSIS/Core/Include/
 INC += -I $(TOP)/external/CMSIS_5/Device/ARM/ARMCM0/Include
-INC += -I $(TOP)/include
 
-LIBS = $(LIBGCC)
+LIBS =
 
 DEPS = $(OBJS:.o=.d)
 
 all: $(TARGET)
 	$(OBJCOPY) -O binary $< $<.bin
+	-python fw-pack.py $<.bin $(GIT_HASH) $<.packed.bin
+	-python3 fw-pack.py $<.bin $(GIT_HASH) $<.packed.bin
 	$(SIZE) $<
 
 debug:
