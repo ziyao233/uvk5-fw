@@ -13,6 +13,17 @@
 #include"misc.h"
 #include"settings.h"
 #include"radio.h"
+#include"driver/eeprom.h"
+
+#define EEPROM_BASE		0x0640
+#define EEPROM_ENTRY(no)	(EEPROM_BASE + (no) * 22)
+#define SLICES(no)		(EEPROM_ENTRY(no) + 14)
+#define SLICE_N(no, stage)	(SLICES(no) + (stage))
+#define UFREQ(no)		(EEPROM_ENTRY(no) + 6)
+#define VFREQ(no)		(EEPROM_ENTRY(no) + 10)
+#define ATTR(no)		(EEPROM_ENTRY(no) + 5)
+#define NAME(no)		(EEPROM_ENTRY(no) + 0)
+#define SLICE_LENGTH(s)		((s) << 2)
 
 bool gSateliteMode, gSateliteDownCounting;
 uint16_t gSateliteRemainTime, gSateliteStageRemainTime;
@@ -23,17 +34,22 @@ uint8_t gSateliteStage;
 static void
 satelite_get_time_and_name(void)
 {
-	gSateliteRemainTime = 40;
+	uint8_t t[8] = { 0 };
+	EEPROM_ReadBuffer(SLICES(gSateliteNo), t, 8);
+	gSateliteRemainTime = 0;
+	for (int i = 0; i < 8; i++)
+		gSateliteRemainTime += SLICE_LENGTH(t[i]);
 
-	strcpy(gSateliteName, "     ");
-	strncpy(gSateliteName, "ISS", strlen("ISS"));
+	EEPROM_ReadBuffer(NAME(gSateliteNo), gSateliteName, 5);
 	return;
 }
 
 static void
 satelite_set_stage_time(void)
 {
-	gSateliteStageRemainTime = 5;
+	uint8_t s;
+	EEPROM_ReadBuffer(SLICE_N(gSateliteNo, gSateliteStage), &s, 1);
+	gSateliteStageRemainTime = SLICE_LENGTH(s);
 	return;
 }
 
@@ -47,27 +63,44 @@ do_set_freq(uint32_t rx, uint32_t tx)
 static void
 satelite_set_freq(void)
 {
-	uint32_t baseFreq = 43850000;
+	uint32_t baseUFreq;
+	EEPROM_ReadBuffer(UFREQ(gSateliteNo), &baseUFreq, 4);
 
 	gEeprom.CROSS_BAND_RX_TX = CROSS_BAND_OFF;
 	gEeprom.DUAL_WATCH = DUAL_WATCH_OFF;
 	gEeprom.TX_VFO = 0;
 	RADIO_SelectVfos();
 
-	do_set_freq(baseFreq - 250 * gSateliteStage, 0);
+	do_set_freq(baseUFreq - 250 * gSateliteStage, 0);
 	return;
 }
 
-static inline void
+static int
+satelite_get_valid_nums(void)
+{
+	for (int i = 0; i < 72; i++) {
+		char b;
+		EEPROM_ReadBuffer(EEPROM_ENTRY(i), &b, 1);
+		if (b == 0xff)
+			return i;
+	}
+	return 72;
+}
+
+static inline int
 satelite_enter(void)
 {
+	if (satelite_get_valid_nums() == 0)
+		return -1;
+
 	gSateliteNo			= 0;
 	gSateliteStage			= 0;
 
 	satelite_get_time_and_name();
 	satelite_set_stage_time();
 	satelite_set_freq();
-	return;
+
+	return 0;
 }
 
 static inline void
@@ -80,10 +113,12 @@ satelite_exit(void)
 void
 SATELITE_mode_switch(void)
 {
-	if (gSateliteMode)
+	if (gSateliteMode) {
 		satelite_exit();
-	else
-		satelite_enter();
+	} else {
+		if (satelite_enter())
+			return;
+	}
 	gSateliteMode = !gSateliteMode;
 	gUpdateStatus = true;
 	gUpdateDisplay = true;

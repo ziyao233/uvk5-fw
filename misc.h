@@ -30,9 +30,12 @@
 #define IS_NOT_NOAA_CHANNEL(x) ((x) >= MR_CHANNEL_FIRST && (x) <= FREQ_CHANNEL_LAST)
 #define IS_VALID_CHANNEL(x) ((x) < LAST_CHANNEL)
 
+/*
+ *	MR Channels from 100 199 are reserved for satelite data.
+ */
 enum {
 	MR_CHANNEL_FIRST = 0U,
-	MR_CHANNEL_LAST = 199U,
+	MR_CHANNEL_LAST = 99U,
 	FREQ_CHANNEL_FIRST = 200U,
 	FREQ_CHANNEL_LAST = 206U,
 #if defined(ENABLE_NOAA)

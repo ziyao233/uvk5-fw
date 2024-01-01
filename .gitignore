@@ -7,3 +7,4 @@ sram-overlay.bin
 firmware
 firmware.bin
 firmware.pack.bin
+*.bin

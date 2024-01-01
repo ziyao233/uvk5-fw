@@ -12,7 +12,7 @@
 #include<stdint.h>
 
 extern bool gSateliteMode, gSateliteDownCounting;
-extern uint16_t gSateliteRemainTime, gSateliteStageRemainTime;
+extern uint16_t gSateliteRemainTime, gSateliteStageRemainTime, gSateliteNo;
 extern char gSateliteName[6];
 
 void SATELITE_mode_switch(void);
