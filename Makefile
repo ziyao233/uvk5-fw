@@ -1,13 +1,14 @@
 TARGET = firmware
+BINARY = firmware.bin
 
-ENABLE_AIRCOPY := 1
-ENABLE_ALARM := 1
-ENABLE_FMRADIO := 1
-ENABLE_NOAA := 1
-ENABLE_OVERLAY := 1
-ENABLE_SWD := 0
-ENABLE_TX1750 := 1
-ENABLE_UART := 1
+ENABLE_AIRCOPY	?= 0
+ENABLE_ALARM	?= 0
+ENABLE_FMRADIO	?= 0
+ENABLE_NOAA	?= 0
+ENABLE_OVERLAY	?= 0
+ENABLE_SWD	?= 0
+ENABLE_TX1750	?= 0
+ENABLE_UART	?= 1
 
 BSP_DEFINITIONS := $(wildcard hardware/*/*.def)
 BSP_HEADERS := $(patsubst hardware/%,bsp/%,$(BSP_DEFINITIONS))
@@ -163,17 +164,14 @@ LIBS =
 
 DEPS = $(OBJS:.o=.d)
 
-all: $(TARGET)
-	$(OBJCOPY) -O binary $< $<.bin
-	-python fw-pack.py $<.bin $(GIT_HASH) $<.packed.bin
-	-python3 fw-pack.py $<.bin $(GIT_HASH) $<.packed.bin
-	$(SIZE) $<
+all: $(TARGET) $(BINARY)
 
-debug:
-	/opt/openocd/bin/openocd -c "bindto 0.0.0.0" -f interface/jlink.cfg -f dp32g030.cfg
+$(BINARY): $(TARGET)
+	$(OBJCOPY) -O binary $(TARGET) $(BINARY)
+	$(SIZE) $(TARGET)
 
-flash:
-	/opt/openocd/bin/openocd -c "bindto 0.0.0.0" -f interface/jlink.cfg -f dp32g030.cfg -c "write_image firmware.bin 0; shutdown;"
+flash: $(BINARY)
+	./tools/flash.sh $(BINARY)
 
 version.o: .FORCE
 
