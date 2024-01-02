@@ -16,11 +16,8 @@ extern uint16_t gSateliteRemainTime, gSateliteStageRemainTime, gSateliteNo;
 extern char gSateliteName[6];
 
 void SATELITE_mode_switch(void);
+void SATELITE_start(void);
 void SATELITE_next_stage(void);
 void SATELITE_updown_key(bool bKeyPressed, bool bKeyHeld, int adj);
-
-#define SATELITE_start() do { \
-	gSateliteDownCounting = true;		\
-} while (0)
 
 #endif	// __APP_SATELITE_H_INC__

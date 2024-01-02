@@ -1436,7 +1436,8 @@ static void APP_ProcessKey(KEY_Code_t Key, bool bKeyPressed, bool bKeyHeld)
 		}
 	}
 
-	if (gWasFKeyPressed && Key > KEY_9 && Key != KEY_F && Key != KEY_STAR) {
+	if (gWasFKeyPressed && Key > KEY_9 && Key != KEY_F && Key != KEY_STAR &&
+	    !(gSateliteMode && (Key == KEY_UP || Key == KEY_DOWN))) {
 		gWasFKeyPressed = false;
 		gUpdateStatus = true;
 	}

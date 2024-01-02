@@ -14,6 +14,7 @@
 #include"settings.h"
 #include"radio.h"
 #include"driver/eeprom.h"
+#include"driver/keyboard.h"
 
 #define EEPROM_BASE		0x0640
 #define EEPROM_ENTRY(no)	(EEPROM_BASE + (no) * 22)
@@ -26,10 +27,11 @@
 #define SLICE_LENGTH(s)		((s) << 2)
 
 bool gSateliteMode, gSateliteDownCounting;
-uint16_t gSateliteRemainTime, gSateliteStageRemainTime;
+uint16_t gSateliteRemainTime, gSateliteStageRemainTime, gSateliteTotalTime;
 char gSateliteName[6];
 uint16_t gSateliteNo, gSateliteNum;
-uint8_t gSateliteStage, gSateliteStages;
+uint8_t gSateliteStage;
+float gTimeScale;
 
 static void
 satelite_get_time_and_name(void)
@@ -39,6 +41,7 @@ satelite_get_time_and_name(void)
 	gSateliteRemainTime = 0;
 	for (int i = 0; i < 8; i++)
 		gSateliteRemainTime += SLICE_LENGTH(t[i]);
+	gSateliteTotalTime = gSateliteRemainTime;
 
 	EEPROM_ReadBuffer(NAME(gSateliteNo), gSateliteName, 5);
 	return;
@@ -49,7 +52,7 @@ satelite_set_stage_time(void)
 {
 	uint8_t s;
 	EEPROM_ReadBuffer(SLICE_N(gSateliteNo, gSateliteStage), &s, 1);
-	gSateliteStageRemainTime = SLICE_LENGTH(s);
+	gSateliteStageRemainTime = (uint16_t)(SLICE_LENGTH(s) * gTimeScale);
 	return;
 }
 
@@ -167,6 +170,29 @@ SATELITE_mode_switch(void)
 }
 
 void
+SATELITE_start(void)
+{
+	if (gSateliteRemainTime != gSateliteTotalTime) {
+		gTimeScale = (gSateliteRemainTime + 0.) / gSateliteTotalTime;
+		uint16_t scaledTime = 0;
+		uint8_t slices[8];
+		EEPROM_ReadBuffer(SLICES(gSateliteNo), slices, 8);
+
+		for (int i = 0; i < 8; i ++) {
+			scaledTime += (uint16_t)(SLICE_LENGTH(slices[i]) *
+						 gTimeScale);
+		}
+
+		gSateliteRemainTime = scaledTime;
+		satelite_set_stage_time();
+	} else {
+		gTimeScale = 1.;
+	}
+	gSateliteDownCounting = 1;
+	return;
+}
+
+void
 SATELITE_next_stage(void)
 {
 	gSateliteStage++;
@@ -183,10 +209,18 @@ SATELITE_updown_key(bool bKeyPressed, bool bKeyHeld, int adj)
 
 	if (gSateliteDownCounting)
 		return;
-
-	gSateliteNo = (gSateliteNo + adj + gSateliteNum) % gSateliteNum;
-	gSateliteStage = 0;
-	satelite_load_data();
+	if (gWasFKeyPressed) {
+		gWasFKeyPressed = false;
+		int32_t adjusted = (int32_t)gSateliteRemainTime + adj * 15;
+		if (adjusted <= 0 || adjusted > 65535)
+			return;
+		else
+			gSateliteRemainTime = adjusted;
+	} else {
+		gSateliteNo = (gSateliteNo + adj + gSateliteNum) % gSateliteNum;
+		gSateliteStage = 0;
+		satelite_load_data();
+	}
 	gUpdateDisplay = true;
 	return;
 }
