@@ -66,6 +66,26 @@ do_set_freq(uint32_t rx, uint32_t tx)
 							FREQUENCY_DEVIATION_ADD;
 		gCurrentVfo->FREQUENCY_OF_DEVIATION = tx - rx;
 	}
+
+	return;
+}
+
+static void
+satelite_set_ctcss(void)
+{
+	uint8_t attr;
+	EEPROM_ReadBuffer(ATTR(gSateliteNo), &attr, 1);
+	attr &= 0x1f;
+
+	FREQ_Config_t *p = &gTxVfo->ConfigTX;
+	if (attr) {
+		p->CodeType	= CODE_TYPE_CONTINUOUS_TONE;
+		p->Code		= attr - 1;
+	} else {
+		p->CodeType	= CODE_TYPE_OFF;
+		p->Code		= 0;
+	}
+
 	return;
 }
 
@@ -111,6 +131,7 @@ satelite_enter(void)
 	satelite_get_time_and_name();
 	satelite_set_stage_time();
 	satelite_set_freq();
+	satelite_set_ctcss();
 
 	return 0;
 }
