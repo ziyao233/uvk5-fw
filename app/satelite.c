@@ -17,13 +17,15 @@
 #include"driver/keyboard.h"
 
 #define EEPROM_BASE		0x0640
-#define EEPROM_ENTRY(no)	(EEPROM_BASE + (no) * 22)
+#define EEPROM_ENTRY(no)	(EEPROM_BASE + (no) * 24)
 #define SLICES(no)		(EEPROM_ENTRY(no) + 14)
 #define SLICE_N(no, stage)	(SLICES(no) + (stage))
 #define UFREQ(no)		(EEPROM_ENTRY(no) + 6)
 #define VFREQ(no)		(EEPROM_ENTRY(no) + 10)
 #define ATTR(no)		(EEPROM_ENTRY(no) + 5)
 #define NAME(no)		(EEPROM_ENTRY(no) + 0)
+#define TIME(no)		(EEPROM_ENTRY(no) + 22)
+
 #define SLICE_LENGTH(s)		((s) << 2)
 
 bool gSateliteMode, gSateliteDownCounting;
@@ -36,11 +38,7 @@ float gTimeScale;
 static void
 satelite_get_time_and_name(void)
 {
-	uint8_t t[8] = { 0 };
-	EEPROM_ReadBuffer(SLICES(gSateliteNo), t, 8);
-	gSateliteRemainTime = 0;
-	for (int i = 0; i < 8; i++)
-		gSateliteRemainTime += SLICE_LENGTH(t[i]);
+	EEPROM_ReadBuffer(TIME(gSateliteNo), &gSateliteRemainTime, 2);
 	gSateliteTotalTime = gSateliteRemainTime;
 
 	EEPROM_ReadBuffer(NAME(gSateliteNo), gSateliteName, 5);
@@ -50,6 +48,11 @@ satelite_get_time_and_name(void)
 static void
 satelite_set_stage_time(void)
 {
+	if (gSateliteStage >= 8) {
+		gSateliteStageRemainTime = 65535;
+		return;
+	}
+
 	uint8_t s;
 	EEPROM_ReadBuffer(SLICE_N(gSateliteNo, gSateliteStage), &s, 1);
 	gSateliteStageRemainTime = (uint16_t)(SLICE_LENGTH(s) * gTimeScale);
@@ -174,20 +177,11 @@ SATELITE_start(void)
 {
 	if (gSateliteRemainTime != gSateliteTotalTime) {
 		gTimeScale = (gSateliteRemainTime + 0.) / gSateliteTotalTime;
-		uint16_t scaledTime = 0;
-		uint8_t slices[8];
-		EEPROM_ReadBuffer(SLICES(gSateliteNo), slices, 8);
-
-		for (int i = 0; i < 8; i ++) {
-			scaledTime += (uint16_t)(SLICE_LENGTH(slices[i]) *
-						 gTimeScale);
-		}
-
-		gSateliteRemainTime = scaledTime;
 		satelite_set_stage_time();
 	} else {
 		gTimeScale = 1.;
 	}
+	satelite_set_stage_time();
 	gSateliteDownCounting = 1;
 	return;
 }

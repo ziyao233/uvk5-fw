@@ -11,7 +11,7 @@ local string		= require "string";
 local io		= require "io";
 local table		= require "table";
 
-local cMaxSateliteNum <const> = 72;
+local cMaxSateliteNum <const> = 66;
 
 --[[
 --	Satelite Data File Format:
@@ -22,6 +22,7 @@ local cMaxSateliteNum <const> = 72;
 				string	CTCSS (CTCSS Frequency)
 				int	uFreq	(U Frequnecy Limitation in Hz)
 				int	vFreq	(V Frequency Limitation in Hz)
+				int	time
 				array	slices [
 						int, eight or less time slices
 					       ]
@@ -43,6 +44,7 @@ ctcss[""] = 0;
 --[[
 --	| name (5B) | attr (1B) | U Frequency (4B) | V Frequency (4B) |
 --	| Time Slices (1B * 8, one unit stands for 4 seconds) |
+--	| Total Time (2B) |
 --
 --	attr:
 --		| unused (2b) | direction (0 for v to u) | CTCSS (0 for none) |
@@ -58,7 +60,7 @@ local function convert(s)
 		local length = s.slices[i] or 0;
 		t = t .. ("<I1"):pack(length // 4);
 	end
-	return t;
+	return t .. ("<I2"):pack(s.time);
 end
 
 local builder = {};
@@ -68,5 +70,5 @@ do
 end
 
 output:write(table.concat(builder));
-output:write(("\xff"):rep(22));
+output:write(("\xff"):rep(24));
 output:close();
