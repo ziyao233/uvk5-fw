@@ -29,7 +29,7 @@ bool gSateliteMode, gSateliteDownCounting;
 uint16_t gSateliteRemainTime, gSateliteStageRemainTime;
 char gSateliteName[6];
 uint16_t gSateliteNo;
-uint8_t gSateliteStage;
+uint8_t gSateliteStage, gSateliteStages;
 
 static void
 satelite_get_time_and_name(void)
@@ -56,22 +56,34 @@ satelite_set_stage_time(void)
 static inline void
 do_set_freq(uint32_t rx, uint32_t tx)
 {
-	(void)tx;
 	GENERIC_Set_Freq(0, rx);
+	if (tx < rx) {
+		gCurrentVfo->FREQUENCY_DEVIATION_SETTING =
+							FREQUENCY_DEVIATION_SUB;
+		gCurrentVfo->FREQUENCY_OF_DEVIATION = rx - tx;
+	} else {
+		gCurrentVfo->FREQUENCY_DEVIATION_SETTING =
+							FREQUENCY_DEVIATION_ADD;
+		gCurrentVfo->FREQUENCY_OF_DEVIATION = tx - rx;
+	}
+	return;
 }
 
 static void
 satelite_set_freq(void)
 {
-	uint32_t baseUFreq;
-	EEPROM_ReadBuffer(UFREQ(gSateliteNo), &baseUFreq, 4);
+	uint32_t uFreq, vFreq;
+	EEPROM_ReadBuffer(UFREQ(gSateliteNo), &uFreq, 4);
+	EEPROM_ReadBuffer(VFREQ(gSateliteNo), &vFreq, 4);
 
 	gEeprom.CROSS_BAND_RX_TX = CROSS_BAND_OFF;
 	gEeprom.DUAL_WATCH = DUAL_WATCH_OFF;
 	gEeprom.TX_VFO = 0;
 	RADIO_SelectVfos();
 
-	do_set_freq(baseUFreq - 250 * gSateliteStage, 0);
+	do_set_freq(uFreq - 250 * gSateliteStage,
+		    vFreq + 250 *
+		    ((gSateliteStage >= 1) + (gSateliteStage >= 4)));
 	return;
 }
 
