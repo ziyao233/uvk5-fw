@@ -28,7 +28,7 @@
 bool gSateliteMode, gSateliteDownCounting;
 uint16_t gSateliteRemainTime, gSateliteStageRemainTime;
 char gSateliteName[6];
-uint16_t gSateliteNo;
+uint16_t gSateliteNo, gSateliteNum;
 uint8_t gSateliteStage, gSateliteStages;
 
 static void
@@ -119,19 +119,27 @@ satelite_get_valid_nums(void)
 	return 72;
 }
 
+static void
+satelite_load_data(void)
+{
+	satelite_get_time_and_name();
+	satelite_set_stage_time();
+	satelite_set_freq();
+	satelite_set_ctcss();
+	return;
+}
+
 static inline int
 satelite_enter(void)
 {
-	if (satelite_get_valid_nums() == 0)
+	gSateliteNum = satelite_get_valid_nums();
+	if (!gSateliteNum)
 		return -1;
 
 	gSateliteNo			= 0;
 	gSateliteStage			= 0;
 
-	satelite_get_time_and_name();
-	satelite_set_stage_time();
-	satelite_set_freq();
-	satelite_set_ctcss();
+	satelite_load_data();
 
 	return 0;
 }
@@ -164,5 +172,21 @@ SATELITE_next_stage(void)
 	gSateliteStage++;
 	satelite_set_stage_time();
 	satelite_set_freq();
+	return;
+}
+
+void
+SATELITE_updown_key(bool bKeyPressed, bool bKeyHeld, int adj)
+{
+	if (bKeyHeld || !bKeyPressed)
+		return;
+
+	if (gSateliteDownCounting)
+		return;
+
+	gSateliteNo = (gSateliteNo + adj + gSateliteNum) % gSateliteNum;
+	gSateliteStage = 0;
+	satelite_load_data();
+	gUpdateDisplay = true;
 	return;
 }

@@ -17,6 +17,7 @@ extern char gSateliteName[6];
 
 void SATELITE_mode_switch(void);
 void SATELITE_next_stage(void);
+void SATELITE_updown_key(bool bKeyPressed, bool bKeyHeld, int adj);
 
 #define SATELITE_start() do { \
 	gSateliteDownCounting = true;		\

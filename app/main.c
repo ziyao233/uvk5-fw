@@ -446,10 +446,16 @@ void MAIN_ProcessKeys(KEY_Code_t Key, bool bKeyPressed, bool bKeyHeld)
 			MAIN_Key_MENU(bKeyPressed, bKeyHeld);
 		break;
 	case KEY_UP:
-		MAIN_Key_UP_DOWN(bKeyPressed, bKeyHeld, 1);
+		if (gSateliteMode)
+			SATELITE_updown_key(bKeyPressed, bKeyHeld, 1);
+		else
+			MAIN_Key_UP_DOWN(bKeyPressed, bKeyHeld, 1);
 		break;
 	case KEY_DOWN:
-		MAIN_Key_UP_DOWN(bKeyPressed, bKeyHeld, -1);
+		if (gSateliteMode)
+			SATELITE_updown_key(bKeyPressed, bKeyHeld, -1);
+		else
+			MAIN_Key_UP_DOWN(bKeyPressed, bKeyHeld, -1);
 		break;
 	case KEY_EXIT:
 		MAIN_Key_EXIT(bKeyPressed, bKeyHeld);
