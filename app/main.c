@@ -440,10 +440,17 @@ void MAIN_ProcessKeys(KEY_Code_t Key, bool bKeyPressed, bool bKeyHeld)
 		MAIN_Key_DIGITS(Key, bKeyPressed, bKeyHeld);
 		break;
 	case KEY_MENU:
-		if (gSateliteMode)
-			SATELITE_start();
-		else
+		if (gSateliteMode) {
+			if (bKeyHeld || !bKeyPressed)
+				break;
+
+			if (gSateliteDownCounting)
+				SATELITE_skip();
+			else
+				SATELITE_start();
+		} else {
 			MAIN_Key_MENU(bKeyPressed, bKeyHeld);
+		}
 		break;
 	case KEY_UP:
 		if (gSateliteMode)

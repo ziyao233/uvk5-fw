@@ -19,5 +19,6 @@ void SATELITE_mode_switch(void);
 void SATELITE_start(void);
 void SATELITE_next_stage(void);
 void SATELITE_updown_key(bool bKeyPressed, bool bKeyHeld, int adj);
+void SATELITE_skip(void);
 
 #endif	// __APP_SATELITE_H_INC__

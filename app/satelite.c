@@ -109,7 +109,7 @@ satelite_set_freq(void)
 
 	do_set_freq(uFreq - 250 * gSateliteStage,
 		    vFreq + 250 *
-		    ((gSateliteStage >= 1) + (gSateliteStage >= 4)));
+		    ((gSateliteStage >= 2) + (gSateliteStage >= 7)));
 	return;
 }
 
@@ -216,5 +216,16 @@ SATELITE_updown_key(bool bKeyPressed, bool bKeyHeld, int adj)
 		satelite_load_data();
 	}
 	gUpdateDisplay = true;
+	return;
+}
+
+void
+SATELITE_skip(void)
+{
+	if (gSateliteStage < 8) {
+		gSateliteRemainTime -= gSateliteStageRemainTime;
+		SATELITE_next_stage();
+		gUpdateDisplay = true;
+	}
 	return;
 }
