@@ -1,4 +1,4 @@
-local slices = { 180, 76, 36, 32, 24, 32, 36, 76 };
+local slices = { 188, 76, 36, 28, 24, 28, 36, 76 };
 
 return {
 	{
@@ -7,7 +7,7 @@ return {
 		uFreq	= 437210000,
 		vFreq	= 144352500,
 		slices	= slices,
-		time	= 660,
+		time	= 680,
 	},
 	{
 		name	= "SO-50",
@@ -16,7 +16,7 @@ return {
 		vFreq	= 145847500,
 		CTCSS	= "67.0",
 		slices	= slices,
-		time	= 660,
+		time	= 680,
 	},
 	{
 		name	= "TEVEL",
@@ -24,7 +24,7 @@ return {
 		uFreq	= 436410000,
 		vFreq	= 145967500,
 		slices	= slices,
-		time	= 660,
+		time	= 680,
 	},
 	{
 		name	= "ISS",
@@ -33,6 +33,6 @@ return {
 		vFreq	= 145987500,
 		CTCSS	= "67.0",
 		slices	= slices,
-		time	= 660,
+		time	= 680,
 	},
        };
